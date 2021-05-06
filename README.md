@@ -1,52 +1,158 @@
-![CI logo](https://codeinstitute.s3.amazonaws.com/fullstack/ci_logo_small.png)
+Connect to Mongo CLI on Gitpod
+navigate to your MongoDB Clusters Sandbox
+click "Connect" button
+select "Connect with the mongo shell"
+select "I do not have the mongo shell installed"
+choose option: "Run your connection string in your command line"
+mongo "mongodb+srv://<CLUSTER-NAME>.mongodb.net/<DBname>" --username <USERNAME>
+replace all <angle-bracket> keys with your own data
+enter password *(will not echo ******** on screen)
+Clear screen in Mongo Shell:
+cls
+Show all database collections:
+show collections
+Assign collection to variable 'coll':
+coll = db.collection_name
+Insert data to collection:
+coll.insert({
+    first: "john",
+    last: "lennon",
+    dob: "09/10/1940",
+    gender: "m",
+    hair_color: "brown",
+    occupation: "beatle",
+    nationality: "british"
+});
+coll.insert({
+    first: "eve",
+    last: "ryan",
+    dob: "19/09/1992",
+    gender: "f",
+    hair_color: "pink",
+    occupation: "developer",
+    nationality: "irish"
+});
+coll.insert({
+    first: "martha",
+    last: "fenton",
+    dob: "15/05/1974",
+    gender: "f",
+    hair_color: "brown",
+    occupation: "manager",
+    nationality: "irish"
+});
+coll.insert({
+    first: "neil",
+    last: "hanslem",
+    dob: "14/07/1983",
+    gender: "m",
+    hair_color: "blonde",
+    occupation: "actor",
+    nationality: "british"
+});
+coll.insert({
+    first: "rocky",
+    last: "persolm",
+    dob: "19/12/1994",
+    gender: "f",
+    hair_color: "black",
+    occupation: "activist",
+    nationality: "american"
+});
+Find all documents in collection:
+coll.find();
+Find all documents with gender == "f":
+coll.find({gender: "f"});
+Find all documents with gender == "f" AND nationality == "british":
+coll.find({gender: "f", nationality: "british"});
+Find all documents with gender == "f" AND nationality == "american" OR "irish":
+coll.find({gender: "f", $or: [{nationality: "american"}, {nationality: "irish"}]});
+Find all documents with gender == "f" AND nationality == "american" OR "irish", then sort by nationality (ascending):
+coll.find({gender: "f", $or: [{nationality: "american"}, {nationality: "irish"}]}).sort({nationality: 1});
+Find all documents with gender == "f" AND nationality == "american" OR "irish", then sort by nationality (descending):
+coll.find({gender: "f", $or: [{nationality: "american"}, {nationality: "irish"}]}).sort({nationality: -1});
 
-Welcome USER_NAME,
 
-This is the Code Institute student template for Gitpod. We have preinstalled all of the tools you need to get started. You can safely delete this README.md file, or change it for your own project. Please do read it at least once, though! It contains some important information about Gitpod and the extensions we use.
+#mongo.py file
 
-## Gitpod Reminders
+import os
+import pymongo
+if os.path.exists("env.py"):
+    import env
 
-To run a frontend (HTML, CSS, Javascript only) application in Gitpod, in the terminal, type:
 
-`python3 -m http.server`
+MONGO_URI = os.environ.get("MONGO_URI")
+DATABASE = "myFirstDB"
+COLLECTION = "celebrities"
 
-A blue button should appear to click: _Make Public_,
 
-Another blue button should appear to click: _Open Browser_.
+def mongo_connect(url):
+    try:
+        conn = pymongo.MongoClient(url)
+        print("Mongo is connected")
+        return conn
+    except pymongo.errors.ConnectionFailure as e:
+        print("Could not connect to MongoDB: %s") % e
 
-To run a backend Python file, type `python3 app.py`, if your Python file is named `app.py` of course.
 
-A blue button should appear to click: _Make Public_,
+conn = mongo_connect(MONGO_URI)
 
-Another blue button should appear to click: _Open Browser_.
+coll = conn[DATABASE][COLLECTION]
 
-In Gitpod you have superuser security privileges by default. Therefore you do not need to use the `sudo` (superuser do) command in the bash terminal in any of the lessons.
+documents = coll.find()
 
-To log into the Heroku toolbelt CLI you can use:
+""" Insert a single document """
+# new_doc = {
+#     "first": "douglas",
+#     "last": "adams",
+#     "dob": "11/03/1952",
+#     "gender": "m",
+#     "hair_color": "grey",
+#     "occupation": "writer",
+#     "nationality": "british"
+# }
+# coll.insert(new_doc)
 
-`heroku login -i`
+""" Insert multipe documents """
+# new_docs = [{
+#     "first": "terry",
+#     "last": "pratchett",
+#     "dob": "28/04/1948",
+#     "gender": "m",
+#     "hair_color": "not much",
+#     "occupation": "writer",
+#     "nationality": "british"
+# }, {
+#     "first": "george",
+#     "last": "rr martin",
+#     "dob": "20/09/1948",
+#     "gender": "m",
+#     "hair_color": "white",
+#     "occupation": "writer",
+#     "nationality": "american"
+# }]
+# coll.insert_many(new_docs)
 
-If you have Multi-Factor Authentication (MFA) enabled then use the API key that was generated for you at [Heroku](https://dashboard.heroku.com/account) as your password.
-This API key is unique and private to you so do not share it. If you accidently make it public then you can create a new one with _Regenerate API Key_.
+""" Find documents with 'first' name set to 'douglas' """
+# documents = coll.find({"first": "douglas"})
 
-## Updates Since The Instructional Video
+""" Delete documents with 'first' name set to 'douglas' """
+# coll.remove({"first": "douglas"})
+# documents = coll.find()
 
-We continually tweak and adjust this template to help give you the best experience. Here is the version history:
+""" Update a single document (first one only) """
+# coll.update_one(
+#     {"nationality": "american"},
+#     {"$set": {"hair_color": "maroon"}}
+# )
+# documents = coll.find({"nationality": "american"})
 
-**October 21 2020:** Versions of the HTMLHint, Prettier, Bootstrap4 CDN and Auto Close extensions updated. The Python extension needs to stay the same version for now.
+""" Update all documents """
+# coll.update_many(
+#     {"nationality": "american"},
+#     {"$set": {"hair_color": "maroon"}}
+# )
+# documents = coll.find({"nationality": "american"})
 
-**October 08 2020:** Additional large Gitpod files (`core.mongo*` and `core.python*`) are now hidden in the Explorer, and have been added to the `.gitignore` by default.
-
-**September 22 2020:** Gitpod occasionally creates large `core.Microsoft` files. These are now hidden in the Explorer. A `.gitignore` file has been created to make sure these files will not be committed, along with other common files.
-
-**April 16 2020:** The template now automatically installs MySQL instead of relying on the Gitpod MySQL image. The message about a Python linter not being installed has been dealt with, and the set-up files are now hidden in the Gitpod file explorer.
-
-**April 13 2020:** Added the _Prettier_ code beautifier extension instead of the code formatter built-in to Gitpod.
-
-**February 2020:** The initialisation files now _do not_ auto-delete. They will remain in your project. You can safely ignore them. They just make sure that your workspace is configured correctly each time you open it. It will also prevent the Gitpod configuration popup from appearing.
-
-**December 2019:** Added Eventyret's Bootstrap 4 extension. Type `!bscdn` in a HTML file to add the Bootstrap boilerplate. Check out the <a href="https://github.com/Eventyret/vscode-bcdn" target="_blank">README.md file at the official repo</a> for more options.
-
----
-
-Happy coding!
+for doc in documents:
+    print(doc)
